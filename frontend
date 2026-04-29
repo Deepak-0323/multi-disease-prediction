@@ -1,0 +1,116 @@
+import streamlit as st
+import requests
+
+st.set_page_config(page_title="Multi Disease Prediction", page_icon="🩺")
+
+st.title("🩺 Multi Disease Prediction System")
+
+disease = st.selectbox(
+    "Select Disease to Predict",
+    ["Diabetes", "Heart Disease", "Kidney Disease"]
+)
+
+# -------------------------
+# DIABETES UI
+# -------------------------
+if disease == "Diabetes":
+
+    st.subheader("Enter Patient Details")
+
+    pregnancies = st.number_input("Pregnancies")
+    glucose = st.number_input("Glucose Level")
+    bp = st.number_input("Blood Pressure")
+    skin = st.number_input("Skin Thickness")
+    insulin = st.number_input("Insulin")
+    bmi = st.number_input("BMI")
+    dpf = st.number_input("Diabetes Pedigree Function")
+    age = st.number_input("Age")
+
+    if st.button("Predict Diabetes"):
+
+        features = [
+            pregnancies, glucose, bp, skin,
+            insulin, bmi, dpf, age
+        ]
+
+        response = requests.post(
+            "http://127.0.0.1:8000/predict/diabetes",
+            json={"features": features}
+        )
+
+        result = response.json()
+
+        if result["diabetes_prediction"] == 1:
+            st.error("⚠️ Diabetes Detected")
+        else:
+            st.success("✅ No Diabetes")
+
+
+# -------------------------
+# HEART UI
+# -------------------------
+elif disease == "Heart Disease":
+
+    st.subheader("Enter Heart Health Details")
+
+    age = st.number_input("Age")
+    sex = st.selectbox("Sex", [0, 1])
+    cp = st.number_input("Chest Pain Type")
+    trestbps = st.number_input("Resting Blood Pressure")
+    chol = st.number_input("Cholesterol")
+    fbs = st.selectbox("Fasting Blood Sugar > 120", [0, 1])
+    restecg = st.number_input("Rest ECG")
+    thalach = st.number_input("Max Heart Rate")
+    exang = st.selectbox("Exercise Induced Angina", [0, 1])
+    oldpeak = st.number_input("Oldpeak")
+    slope = st.number_input("Slope")
+    ca = st.number_input("Number of Major Vessels")
+    thal = st.number_input("Thal")
+
+    if st.button("Predict Heart Disease"):
+
+        features = [
+            age, sex, cp, trestbps, chol, fbs,
+            restecg, thalach, exang, oldpeak,
+            slope, ca, thal
+        ]
+
+        response = requests.post(
+            "http://127.0.0.1:8000/predict/heart",
+            json={"features": features}
+        )
+
+        result = response.json()
+
+        if result["heart_prediction"] == 1:
+            st.error("⚠️ Heart Disease Detected")
+        else:
+            st.success("✅ Healthy Heart")
+
+
+# -------------------------
+# KIDNEY UI
+# -------------------------
+elif disease == "Kidney Disease":
+
+    st.subheader("Enter Kidney Health Values")
+
+    features = []
+
+    for i in range(28):
+        val = st.number_input(f"Feature {i+1}", value=0.0)
+        features.append(val)
+
+    if st.button("Predict Kidney Disease"):
+
+        response = requests.post(
+            "http://127.0.0.1:8000/predict/kidney",
+            json={"features": features}
+        )
+
+        result = response.json()
+
+        if result["kidney_prediction"] == 1:
+            st.error("⚠️ Kidney Disease Detected")
+        else:
+            st.success("✅ Kidney Healthy")
